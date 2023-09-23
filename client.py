@@ -16,4 +16,5 @@ def get(host, port):
         s.close()
     print(response.decode('latin-1'))
 
-get("www.google.com", 80)
+# get("www.google.com", 80)
+get("localhost", 8000)

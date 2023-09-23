@@ -1,4 +1,5 @@
 import socket
+import threading
 
 HOST = "localhost"
 PORT = 8000
@@ -9,10 +10,21 @@ def start_server():
         # allows previous socket addresses to be reused immediately
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind((HOST, PORT))
-        s.listen(1)
+        s.listen(2)
         conn, addr = s.accept()
         handle_connection(conn, addr)
         s.close()
+
+def start_threaded_server():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        # allows previous socket addresses to be reused immediately
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((HOST, PORT))
+        s.listen(5)
+        while True:
+            conn, addr = s.accept()
+            thread = threading.Thread(target=handle_connection, args=(conn, addr))
+            thread.start()
     
 def handle_connection(conn, addr):
     with conn:
@@ -26,4 +38,5 @@ def handle_connection(conn, addr):
             conn.sendall(data)
         print(response.decode('latin-1'))
 
-start_server()
+# start_server()
+start_threaded_server()

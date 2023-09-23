@@ -1,4 +1,5 @@
 import socket
+import threading
 
 SERVER_IP = "localhost"
 SERVER_PORT = 8080
@@ -19,10 +20,11 @@ def start_threaded_server():
         # allows previous socket addresses to be reused immediately
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind((SERVER_IP, SERVER_PORT))
-        s.listen(1)
-        conn, addr = s.accept()
-        handle_connection(conn, addr)
-        s.close()
+        s.listen(5)
+        while True:
+            conn, addr = s.accept()
+            thread = threading.Thread(target=handle_connection, args=(conn, addr))
+            thread.start()
     
 def handle_connection(conn, addr):
     HOST = "www.google.com"
@@ -56,4 +58,5 @@ def send_request(host, port, request):
         proxy_server.close()
         return response
 
-start_server()
+# start_server()
+start_threaded_server()
